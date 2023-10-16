@@ -1,0 +1,10 @@
+input_processing.c:24:6:fsm_for_mode_button	8	static
+input_processing.c:65:6:fsm_for_modify_button	8	static
+input_processing.c:120:6:fsm_for_set_button	8	static
+input_processing.c:155:6:mode_normal	4	static
+input_processing.c:159:6:mode_mod_red	4	static
+input_processing.c:163:6:mode_mod_yellow	4	static
+input_processing.c:167:6:mode_mod_green	4	static
+input_processing.c:187:6:display7SEG	16	static
+input_processing.c:191:6:update7SEG	16	static
+input_processing.c:215:6:displayAll	4	static
