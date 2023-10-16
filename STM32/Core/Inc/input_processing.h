@@ -14,11 +14,13 @@ void fsm_for_modify_button(void);
 void fsm_for_set_button(void);
 
 //MODE
-extern enum{NORMAL, MOD_RED, MOD_YELLOW, MOD_GREEN} mode;
 void mode_normal();
 void mode_mod_red();
 void mode_mod_yellow();
 void mode_mod_green();
+
+//MAIN
+void mainMode();
 
 //7SEG & 7SEG BUFFER
 const uint8_t digitMask[11];
@@ -29,6 +31,7 @@ void update7SEGBuffer();
 
 //TRAFFIC LIGHTS & TRAFFIC LIGHTS BUFFER
 const uint8_t ledMask[4];
+uint8_t traff1Out, traff2Out, segOut;
 
 void updateLED();
 

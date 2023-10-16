@@ -9,7 +9,7 @@
 
 #define N0_OF_BUTTONS 				       3
 
-#define DURATION_FOR_AUTO_INCREASING	   1000/TIMER_INTERRUPT_PERIOD
+#define DURATION_FOR_AUTO_INCREASING	   100
 #define BUTTON_IS_PRESSED                  GPIO_PIN_RESET
 #define BUTTON_IS_RELEASED                 GPIO_PIN_SET
 
@@ -43,6 +43,7 @@ void button_reading(){
 				debounceButtonBuffer4[i]=debounceButtonBuffer3[i];
 				if((debounceButtonBuffer4[i]==BUTTON_IS_PRESSED)&&(flagForButtonPress1s[i]==0)&&(flagForButtonPress3s[i]==0)){
 					counterForButtonPress[i] = DURATION_FOR_AUTO_INCREASING;
+					HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
 				}
 			}else{
 				if((debounceButtonBuffer4[i]==BUTTON_IS_PRESSED)&&((flagForButtonPress1s[i]==0)||(flagForButtonPress3s[i]==0))){
@@ -53,6 +54,7 @@ void button_reading(){
 								counterForButtonPress[i] = 2*DURATION_FOR_AUTO_INCREASING;
 								flagForButtonPress1s[i]=1;
 							}else flagForButtonPress3s[i]=1;
+							HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
 						}
 					}
 				}

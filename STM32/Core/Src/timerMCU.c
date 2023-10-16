@@ -12,7 +12,8 @@ int timer1Flag=0,timer1=0,
 	timer3Flag=0,timer3=0,
 	timer4Flag=0,timer4=0,
 	timer5Flag=0,timer5=0,
-	timer6Flag=0,timer6=0;
+	timer6Flag=0,timer6=0,
+	timer7Flag=0,timer7=0;
 
 void setTimer1(int duration){
 	timer1=duration/TIMER_INTERRUPT_PERIOD;
@@ -44,6 +45,11 @@ void setTimer6(int duration){
 	timer6Flag=0;
 }
 
+void setTimer7(int duration){
+	timer7=duration/TIMER_INTERRUPT_PERIOD;
+	timer7Flag=0;
+}
+
 void timerRun(){
 	if(timer1>0){
 		timer1--;
@@ -68,5 +74,9 @@ void timerRun(){
 	if(timer6>0){
 		timer6--;
 		if(timer6<=0)timer6Flag=1;
+	}
+	if(timer7>0){
+		timer7--;
+		if(timer7<=0)timer7Flag=1;
 	}
 }

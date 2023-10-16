@@ -24,6 +24,8 @@
 /* USER CODE BEGIN Includes */
 #include "input_processing.h"
 #include "timerMCU.h"
+#include "input_reading.h"
+
 //#include "input_reading.h"
 
 /* USER CODE END Includes */
@@ -100,44 +102,39 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   setTimer1(21);
   setTimer2(31);
-  setTimer3(51);
-  setTimer4(71);
-  setTimer5(111);
-  setTimer6(131);
+  //setTimer3(911);
+  setTimer4(51);
+  setTimer5(71);
+  setTimer6(111);
   while (1)
   {
 	  if(timer1Flag==1){
-		  setTimer1(20);
-		  fsm_for_mode_button();
+		  setTimer1(10);
+		  button_reading();
 	  }
 	  if(timer2Flag==1){
-		  setTimer2(20);
-		  fsm_for_modify_button();
+		  setTimer2(MAIN_MODE_PERIOD);
+		  mainMode();
 	  }
-	  if(timer3Flag==1){
-		  setTimer3(20);
-		  fsm_for_set_button();
-	  }
+	  /*if(timer3Flag==1){
+		  setTimer3(1000);
+		  updateSEGBuffer();
+	  }*/
 	  if(timer4Flag==1){
-		  setTimer4(50);
-		  switch(mode){
-			  case NORMAL:
-				  mode_normal();
-				  break;
-			  case MOD_RED:
-				  mode_mod_red();
-				  break;
-			  case MOD_YELLOW:
-				  mode_mod_yellow();
-				  break;
-			  case MOD_GREEN:
-				  mode_mod_green();
-				  break;
-		  }
+		  setTimer4(500);
+		  displayAll();
 	  }
 	  if(timer5Flag==1){
-		  setTimer5(500);
-		  displayAll();
+		  setTimer5(50);
+		  fsm_for_mode_button();
+	  }
+	  if(timer6Flag==1){
+		  setTimer6(50);
+		  fsm_for_modify_button();
+	  }
+	  if(timer7Flag==1){
+		  setTimer7(50);
+		  fsm_for_set_button();
 	  }
     /* USER CODE END WHILE */
 
@@ -240,18 +237,18 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, RED1_Pin|YELLOW1_Pin|GREEN1_Pin|RED0_Pin
-                          |YELLOW0_Pin|GREEN0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, RED1_Pin|YELLOW1_Pin|GREEN1_Pin|GPIO_PIN_7
+                          |RED0_Pin|YELLOW0_Pin|GREEN0_Pin|GPIO_PIN_15, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SEG00_Pin|SEG01_Pin|SEG02_Pin|EN2_Pin
                           |EN3_Pin|SEG03_Pin|SEG04_Pin|SEG05_Pin
                           |SEG06_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : RED1_Pin YELLOW1_Pin GREEN1_Pin RED0_Pin
-                           YELLOW0_Pin GREEN0_Pin */
-  GPIO_InitStruct.Pin = RED1_Pin|YELLOW1_Pin|GREEN1_Pin|RED0_Pin
-                          |YELLOW0_Pin|GREEN0_Pin;
+  /*Configure GPIO pins : RED1_Pin YELLOW1_Pin GREEN1_Pin PA7
+                           RED0_Pin YELLOW0_Pin GREEN0_Pin PA15 */
+  GPIO_InitStruct.Pin = RED1_Pin|YELLOW1_Pin|GREEN1_Pin|GPIO_PIN_7
+                          |RED0_Pin|YELLOW0_Pin|GREEN0_Pin|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -279,9 +276,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim )
 {
-	if(htim -> Instance == TIM2 ){
-		button_reading ();
-	}
 	timerRun();
 }
 
