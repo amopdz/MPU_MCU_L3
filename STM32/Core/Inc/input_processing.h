@@ -9,9 +9,9 @@
 #define INC_INPUT_PROCESSING_H_
 
 //BUTTON FSM
-void fsm_for_mode_button(void);
-void fsm_for_modify_button(void);
-void fsm_for_set_button(void);
+void fsm_for_mode_button();
+void fsm_for_modify_button();
+void fsm_for_set_button();
 
 //MODE
 void mode_normal();
@@ -23,16 +23,12 @@ void mode_mod_green();
 void mainMode();
 
 //7SEG & 7SEG BUFFER
-const uint8_t digitMask[11];
-const int MAX_7SEG;
 
 void update7SEG(int index);
 void update7SEGBuffer();
+void update7SEGMain();
 
 //TRAFFIC LIGHTS & TRAFFIC LIGHTS BUFFER
-const uint8_t ledMask[4];
-uint8_t traff1Out, traff2Out, segOut;
-
 void updateLED();
 
 //REGISTER ALL TO PIN

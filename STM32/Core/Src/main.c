@@ -102,10 +102,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   setTimer1(21);
   setTimer2(31);
-  //setTimer3(911);
-  setTimer4(51);
-  setTimer5(71);
+  setTimer3(51);
+  setTimer4(71);
+  setTimer5(91);
   setTimer6(111);
+  setTimer7(131);
   while (1)
   {
 	  if(timer1Flag==1){
@@ -116,12 +117,12 @@ int main(void)
 		  setTimer2(MAIN_MODE_PERIOD);
 		  mainMode();
 	  }
-	  /*if(timer3Flag==1){
-		  setTimer3(1000);
-		  updateSEGBuffer();
-	  }*/
+	  if(timer3Flag==1){
+		  setTimer3(250);
+		  update7SEGMain();
+	  }
 	  if(timer4Flag==1){
-		  setTimer4(500);
+		  setTimer4(250);
 		  displayAll();
 	  }
 	  if(timer5Flag==1){

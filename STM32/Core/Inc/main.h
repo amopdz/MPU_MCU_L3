@@ -100,7 +100,7 @@ void Error_Handler(void);
 #define EN1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define TIMER_INTERRUPT_PERIOD	10
-#define MAIN_MODE_PERIOD 100
+#define MAIN_MODE_PERIOD 50
 
 /* USER CODE END Private defines */
 
