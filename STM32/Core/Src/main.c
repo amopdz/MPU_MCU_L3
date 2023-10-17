@@ -100,41 +100,42 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  setTimer1(21);
-  setTimer2(31);
-  setTimer3(51);
-  setTimer4(71);
-  setTimer5(91);
-  setTimer6(111);
-  setTimer7(131);
+  initTimer();
+  setTimer(21,0);
+  setTimer(31,1);
+  setTimer(51,2);
+  setTimer(71,3);
+  setTimer(91,4);
+  setTimer(111,5);
+  setTimer(131,6);
   while (1)
   {
-	  if(timer1Flag==1){
-		  setTimer1(10);
+	  if(timerFlag[0]==1){
+		  setTimer(10,0);
 		  button_reading();
 	  }
-	  if(timer2Flag==1){
-		  setTimer2(MAIN_MODE_PERIOD);
+	  if(timerFlag[1]==1){
+		  setTimer(MAIN_MODE_PERIOD,1);
 		  mainMode();
 	  }
-	  if(timer3Flag==1){
-		  setTimer3(250);
-		  update7SEGMain();
+	  if(timerFlag[2]==1){
+		  setTimer(250,2);
+		  update7SegMain();
 	  }
-	  if(timer4Flag==1){
-		  setTimer4(250);
+	  if(timerFlag[3]==1){
+		  setTimer(250,3);
 		  displayAll();
 	  }
-	  if(timer5Flag==1){
-		  setTimer5(50);
+	  if(timerFlag[4]==1){
+		  setTimer(50,4);
 		  fsm_for_mode_button();
 	  }
-	  if(timer6Flag==1){
-		  setTimer6(50);
+	  if(timerFlag[5]==1){
+		  setTimer(50,5);
 		  fsm_for_modify_button();
 	  }
-	  if(timer7Flag==1){
-		  setTimer7(50);
+	  if(timerFlag[6]==1){
+		  setTimer(50,6);
 		  fsm_for_set_button();
 	  }
     /* USER CODE END WHILE */
@@ -238,18 +239,18 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, RED1_Pin|YELLOW1_Pin|GREEN1_Pin|GPIO_PIN_7
-                          |RED0_Pin|YELLOW0_Pin|GREEN0_Pin|GPIO_PIN_15, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, RED1_Pin|YELLOW1_Pin|GREEN1_Pin|RED0_Pin
+                          |YELLOW0_Pin|GREEN0_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SEG00_Pin|SEG01_Pin|SEG02_Pin|EN2_Pin
                           |EN3_Pin|SEG03_Pin|SEG04_Pin|SEG05_Pin
                           |SEG06_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : RED1_Pin YELLOW1_Pin GREEN1_Pin PA7
-                           RED0_Pin YELLOW0_Pin GREEN0_Pin PA15 */
-  GPIO_InitStruct.Pin = RED1_Pin|YELLOW1_Pin|GREEN1_Pin|GPIO_PIN_7
-                          |RED0_Pin|YELLOW0_Pin|GREEN0_Pin|GPIO_PIN_15;
+  /*Configure GPIO pins : RED1_Pin YELLOW1_Pin GREEN1_Pin RED0_Pin
+                           YELLOW0_Pin GREEN0_Pin */
+  GPIO_InitStruct.Pin = RED1_Pin|YELLOW1_Pin|GREEN1_Pin|RED0_Pin
+                          |YELLOW0_Pin|GREEN0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

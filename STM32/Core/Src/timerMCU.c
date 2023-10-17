@@ -5,78 +5,31 @@
  *      Author: hh.aof
  */
 
-#include"main.h"
+#include "main.h"
+#include "timerMCU.h"
 
-int timer1Flag=0,timer1=0,
-	timer2Flag=0,timer2=0,
-	timer3Flag=0,timer3=0,
-	timer4Flag=0,timer4=0,
-	timer5Flag=0,timer5=0,
-	timer6Flag=0,timer6=0,
-	timer7Flag=0,timer7=0;
+uint8_t timerFlag[N0_OF_TIMER],
+		timerCounter[N0_OF_TIMER];
 
-void setTimer1(int duration){
-	timer1=duration/TIMER_INTERRUPT_PERIOD;
-	timer1Flag=0;
+void initTimer(){
+	for(uint8_t i=0;i<N0_OF_TIMER;i++){
+		timerCounter[i]=0;
+		timerFlag[i]=0;
+	}
 }
 
-void setTimer2(int duration){
-	timer2=duration/TIMER_INTERRUPT_PERIOD;
-	timer2Flag=0;
-}
-
-void setTimer3(int duration){
-	timer3=duration/TIMER_INTERRUPT_PERIOD;
-	timer3Flag=0;
-}
-
-void setTimer4(int duration){
-	timer4=duration/TIMER_INTERRUPT_PERIOD;
-	timer4Flag=0;
-}
-
-void setTimer5(int duration){
-	timer5=duration/TIMER_INTERRUPT_PERIOD;
-	timer5Flag=0;
-}
-
-void setTimer6(int duration){
-	timer6=duration/TIMER_INTERRUPT_PERIOD;
-	timer6Flag=0;
-}
-
-void setTimer7(int duration){
-	timer7=duration/TIMER_INTERRUPT_PERIOD;
-	timer7Flag=0;
+void setTimer(uint8_t duration, uint8_t index){
+	if(index>=0&&index<N0_OF_TIMER){
+		timerCounter[index]=duration/TIMER_INTERRUPT_PERIOD;
+		timerFlag[index]=0;
+	}
 }
 
 void timerRun(){
-	if(timer1>0){
-		timer1--;
-		if(timer1<=0)timer1Flag=1;
-	}
-	if(timer2>0){
-		timer2--;
-		if(timer2<=0)timer2Flag=1;
-	}
-	if(timer3>0){
-		timer3--;
-		if(timer3<=0)timer3Flag=1;
-	}
-	if(timer4>0){
-		timer4--;
-		if(timer4<=0)timer4Flag=1;
-	}
-	if(timer5>0){
-		timer5--;
-		if(timer5<=0)timer5Flag=1;
-	}
-	if(timer6>0){
-		timer6--;
-		if(timer6<=0)timer6Flag=1;
-	}
-	if(timer7>0){
-		timer7--;
-		if(timer7<=0)timer7Flag=1;
+	for(uint8_t i=0;i<N0_OF_TIMER;i++){
+		if(timerCounter[i]>0){
+			timerCounter[i]--;
+			if(timerCounter[i]<=0)timerFlag[i]=1;
+		}
 	}
 }

@@ -9,6 +9,8 @@
 #include "input_reading.h"
 #include "input_processing.h"
 
+//VARIABLES
+//Displaying 7 segments LEDs
 const uint8_t digitMask[] = {	//fetch bit by bit, small endian, first position -> final pin e.g Pin6
 		0x40,//0
 		0x79,//1
@@ -22,23 +24,19 @@ const uint8_t digitMask[] = {	//fetch bit by bit, small endian, first position -
 		0x10,//9
 		0x7F//10 e.g blank
 };
-const int MAX7SEG=4;
+
+uint8_t led_buffer[]={0,0,0,0},
+		led7SegCounter=MAX7SEG-1;
+
+//Registering output to the pins
 uint8_t traff1Out=0,
 		traff2Out=0,
 		enOut=0,
-		segOut=0,
-		led_buffer[]={0,0,0,0},
-		led7SegCounter=MAX7SEG-1;
+		segOut=0;
 
+//Handling traffic lights & duration of each light & its duration-in-waiting (not yet set)
 enum {RG,RY,GR,YR} traffCond;
-uint8_t light1Time,light2Time,counter;
-
-enum ButtonState{BUTTON_RELEASED, BUTTON_PRESSED, BUTTON_PRESSED_MORE_THAN_1_SECOND, BUTTON_PRESSED_MORE_THAN_3_SECONDS}
-	 modeButtonState = BUTTON_RELEASED,
-	 modifyButtonState = BUTTON_RELEASED,
-	 setButtonState = BUTTON_RELEASED;
-
-enum {NORMAL, MOD_RED, MOD_YELLOW, MOD_GREEN} mode=NORMAL;
+uint8_t light1Time,light2Time;
 
 uint8_t durationRed = 5,
 		durationRedWaiting,
@@ -48,15 +46,30 @@ uint8_t durationRed = 5,
 		durationGreenWaiting,
 		normalInit=0;
 
-uint8_t intervalCounter=0;
-const uint8_t maxInterval = 2;
+//FSM for main modes & it counter for usage in coordinating main modes, with each main mode use this for different purposes
+enum {NORMAL, MOD_RED, MOD_YELLOW, MOD_GREEN} mode=NORMAL;
+uint8_t counter;
 
-void display7SEG(uint8_t number){
+//Interval for continuous increase when we pressed more than 3s
+uint8_t intervalCounter=0;
+#ifndef MAX_INTERVAL
+#define MAX_INTERVAL 2
+#endif
+
+//Button states for their corresponding FSM
+enum ButtonState{BUTTON_RELEASED, BUTTON_PRESSED, BUTTON_PRESSED_MORE_THAN_1_SECOND, BUTTON_PRESSED_MORE_THAN_3_SECONDS}
+	 modeButtonState = BUTTON_RELEASED,
+	 modifyButtonState = BUTTON_RELEASED,
+	 setButtonState = BUTTON_RELEASED;
+
+//FUNCTIONS
+//7Seg & 7Seg buffer & Driver code for these functions
+void display7Seg(uint8_t number){
 	if(number>=0 && number<10)segOut=digitMask[number];
 }
 
-void update7SEG(int index){
-	display7SEG(led_buffer[index]);
+void update7Seg(int index){
+	display7Seg(led_buffer[index]);
 	switch(index){
 		case 0:
 			enOut=0xE;
@@ -75,11 +88,12 @@ void update7SEG(int index){
 	}
 }
 
-void update7SEGMain(){
+void update7SegMain(){
 	led7SegCounter=led7SegCounter>=MAX7SEG-1?0:led7SegCounter+1;
-	update7SEG(led7SegCounter);
+	update7Seg(led7SegCounter);
 }
 
+//Button FSMs
 void fsm_for_mode_button(){
 	switch(modeButtonState){
 		case BUTTON_RELEASED:
@@ -140,7 +154,7 @@ uint8_t done_interval(){
 		intervalCounter--;
 		return 0;
 	}
-	intervalCounter=maxInterval;
+	intervalCounter=MAX_INTERVAL;
 	return 1;
 }
 
@@ -177,7 +191,7 @@ void fsm_for_modify_button(){
 			} else {
 				if(is_button_pressed_3s(1)){
 					modifyButtonState = BUTTON_PRESSED_MORE_THAN_3_SECONDS;
-					intervalCounter=maxInterval;
+					intervalCounter=MAX_INTERVAL;
 				}
 			}
 			break;
@@ -248,6 +262,7 @@ void fsm_for_set_button(){
 	}
 }
 
+//FSMs for main modes
 void mainMode(){
 	switch(mode){
 		case NORMAL:
@@ -382,19 +397,7 @@ void mode_mod_green(){
 	}
 }
 
-void updateSEGBuffer(){
-	switch(mode){
-		case NORMAL:
-			break;
-		case MOD_RED:
-			break;
-		case MOD_YELLOW:
-			break;
-		case MOD_GREEN:
-			break;
-	}
-}
-
+//Registering output to pins
 void displayAll(){
 	GPIOA->ODR=(traff1Out<<12)|(traff2Out<<4);
 	GPIOB->ODR=(enOut<<8)|(segOut);

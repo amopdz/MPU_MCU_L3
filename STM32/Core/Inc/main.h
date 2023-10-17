@@ -99,9 +99,10 @@ void Error_Handler(void);
 #define EN1_Pin GPIO_PIN_9
 #define EN1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+#define N0_OF_TIMER	7
 #define TIMER_INTERRUPT_PERIOD	10
 #define MAIN_MODE_PERIOD 50
-
+#define MAX7SEG 4
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

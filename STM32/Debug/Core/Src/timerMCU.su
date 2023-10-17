@@ -1,8 +1,3 @@
-timerMCU.c:18:6:setTimer1	16	static
-timerMCU.c:23:6:setTimer2	16	static
-timerMCU.c:28:6:setTimer3	16	static
-timerMCU.c:33:6:setTimer4	16	static
-timerMCU.c:38:6:setTimer5	16	static
-timerMCU.c:43:6:setTimer6	16	static
-timerMCU.c:48:6:setTimer7	16	static
-timerMCU.c:53:6:timerRun	4	static
+timerMCU.c:14:6:initTimer	16	static
+timerMCU.c:21:6:setTimer	16	static
+timerMCU.c:28:6:timerRun	16	static

@@ -8,22 +8,14 @@
 #ifndef INC_TIMERMCU_H_
 #define INC_TIMERMCU_H_
 
-extern int timer1Flag,timer1,
-		   timer2Flag,timer2,
-		   timer3Flag,timer3,
-		   timer4Flag,timer4,
-		   timer5Flag,timer5,
-		   timer6Flag,timer6,
-		   timer7Flag,timer7;
+#ifndef N0_OF_TIMER
+#define N0_OF_TIMER 4
+#endif /* N0_OF_TIMER */
 
-void setTimer1(int duration);
-void setTimer2(int duration);
-void setTimer3(int duration);
-void setTimer4(int duration);
-void setTimer5(int duration);
-void setTimer6(int duration);
-void setTimer7(int duration);
+extern uint8_t timerFlag[];
 
+void initTimer();
+void setTimer(uint8_t, uint8_t);
 void timerRun();
 
 #endif /* INC_TIMERMCU_H_ */
