@@ -1,3 +1,4 @@
+"./Core/Src/hardware_processing.o"
 "./Core/Src/input_processing.o"
 "./Core/Src/input_reading.o"
 "./Core/Src/main.o"

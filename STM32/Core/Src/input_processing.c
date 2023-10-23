@@ -1,218 +1,173 @@
 /*
- * input_processing.c
+ * input_processing_new.c
  *
- *  Created on: Oct 13, 2023
- *      Author: hh.aof
+ *  Created on: Oct 23, 2023
+ *      Author: hhaof
  */
 
 #include "main.h"
-#include "input_reading.h"
 #include "input_processing.h"
+#include "input_reading.h"
 
-//VARIABLES
-//Displaying 7 segments LEDs
-const uint8_t digitMask[] = {	//fetch bit by bit, small endian, first position -> final pin e.g Pin6
-		0x40,//0
-		0x79,//1
-		0x24,//2
-		0x30,//3
-		0x19,//4
-		0x12,//5
-		0x02,//6
-		0x78,//7
-		0x00,//8
-		0x10,//9
-		0x7F//10 e.g blank
-};
+//Traffic light states
+#define RG 0	//RED & GREEN
+#define RY 1	//RED & YELLOW
+#define GR 2	//GREEN & RED
+#define YR 3	//YELLOW & RED
 
-uint8_t led_buffer[]={0,0,0,0},
-		led7SegCounter=MAX7SEG-1;
-
-//Registering output to the pins
-uint8_t traff1Out=0,
-		traff2Out=0,
-		enOut=0,
-		segOut=0;
-
-//Handling traffic lights & duration of each light & its duration-in-waiting (not yet set)
-enum {RG,RY,GR,YR} traffCond;
-uint8_t light1Time,light2Time;
-
-uint8_t durationRed = 5,
+uint8_t light1Time,	//Time for the two 7 segment LEDs
+        light2Time,
+		durationRed = 5,	//Duration for each of the lights & their duration waiting to be set
 		durationRedWaiting,
 		durationYellow = 2,
 		durationYellowWaiting,
 		durationGreen = 3,
 		durationGreenWaiting,
-		normalInit=0;
+		led_buffer[MAX7SEG],	//7 segments LED buffer array
+		buttonFlag[N0_OF_BUTTONS],	//Flags for buttons
+		traffCond,	//FSM for the traffic lights
+		traff1Out,	//Buffer for 2 traffic lights
+		traff2Out;
 
-//FSM for main modes & it counter for usage in coordinating main modes, with each main mode use this for different purposes
-enum {NORMAL, MOD_RED, MOD_YELLOW, MOD_GREEN} mode=NORMAL;
-uint8_t counter;
-
-//Interval for continuous increase when we pressed more than 3s
-uint8_t intervalCounter=0;
-#ifndef MAX_INTERVAL
-#define MAX_INTERVAL 2
-#endif
-
-//Button states for their corresponding FSM
-enum ButtonState{BUTTON_RELEASED, BUTTON_PRESSED, BUTTON_PRESSED_MORE_THAN_1_SECOND, BUTTON_PRESSED_MORE_THAN_3_SECONDS}
-	 modeButtonState = BUTTON_RELEASED,
-	 modifyButtonState = BUTTON_RELEASED,
-	 setButtonState = BUTTON_RELEASED;
-
-//FUNCTIONS
-//7Seg & 7Seg buffer & Driver code for these functions
-void display7Seg(uint8_t number){
-	if(number>=0 && number<10)segOut=digitMask[number];
+//FSM for buttons
+void fsm_automatic(){
+	switch(mode){
+		case INIT:
+			durationRedWaiting=durationRed;
+			durationYellowWaiting=durationYellow;
+			durationGreenWaiting=durationGreen;
+			if(durationRed>durationYellow+durationGreen){
+				durationGreen=durationRed-durationYellow;
+			}else if(durationRed<durationYellow+durationGreen){
+				if(durationGreen+durationYellow>99){
+					durationRed=99;
+					durationGreen=96;
+					durationYellow=3;
+				}else durationRed=durationGreen+durationYellow;
+			}
+			light1Time=durationRed;
+			light2Time=durationGreen;
+			traffCond=RG;
+			led_buffer[0]=light1Time/10;
+			led_buffer[1]=light1Time%10;
+			led_buffer[2]=light2Time/10;
+			led_buffer[3]=light2Time%10;
+			buttonFlag[0]=0;
+			buttonFlag[1]=0;
+			buttonFlag[2]=0;
+			mode=NORMAL;
+			break;
+		case NORMAL:
+			if(is_button_pressed(0))buttonFlag[0]=1;
+			if((!is_button_pressed(0))&&(buttonFlag[0])){
+				mode=MOD_RED;
+				traff1Out=6;
+				traff2Out=6;
+				buttonFlag[0]=0;
+				buttonFlag[1]=0;
+				buttonFlag[2]=0;
+			}
+			break;
+		case MOD_RED:
+			if(is_button_pressed(0))buttonFlag[0]=1;
+			if((!is_button_pressed(0))&&(buttonFlag[0])){
+				mode=MOD_YELLOW;
+				traff1Out=3;
+				traff2Out=3;
+				buttonFlag[0]=0;
+				buttonFlag[1]=0;
+				buttonFlag[2]=0;
+			}
+			if(is_button_pressed(1))buttonFlag[1]=1;
+			if((!is_button_pressed(1)) && (buttonFlag[1])){
+				durationRedWaiting = durationRedWaiting >= 99 ? 1 : durationRedWaiting + 1;
+				buttonFlag[1]=0;
+			}
+			if(is_button_pressed(2))buttonFlag[2]=1;
+			if((!is_button_pressed(2)) && (buttonFlag[2])){
+				durationRed = durationRedWaiting;
+				buttonFlag[2]=0;
+			}
+			break;
+		case MOD_YELLOW:
+			if(is_button_pressed(0))buttonFlag[0]=1;
+			if((!is_button_pressed(0))&&(buttonFlag[0])){
+				mode=MOD_GREEN;
+				traff1Out=3;
+				traff2Out=3;
+				buttonFlag[0]=0;
+				buttonFlag[1]=0;
+				buttonFlag[2]=0;
+			}
+			if(is_button_pressed(1))buttonFlag[1]=1;
+			if((!is_button_pressed(1)) && (buttonFlag[1])){
+				durationYellowWaiting = durationYellowWaiting >= 99 ? 1 : durationYellowWaiting + 1;
+				buttonFlag[1]=0;
+			}
+			if(is_button_pressed(2))buttonFlag[2]=1;
+			if((!is_button_pressed(2)) && (buttonFlag[2])){
+				durationYellow = durationYellowWaiting;
+				buttonFlag[2]=2;
+			}
+			break;
+		case MOD_GREEN:
+			if(is_button_pressed(0))buttonFlag[0]=1;
+			if((!is_button_pressed(0))&&(buttonFlag[0])){
+				mode=INIT;
+			}
+			if(is_button_pressed(1))buttonFlag[1]=1;
+			if((!is_button_pressed(1)) && (buttonFlag[1])){
+				durationGreenWaiting = durationGreenWaiting >= 99 ? 1 : durationGreenWaiting + 1;
+				buttonFlag[1]=0;
+			}
+			if(is_button_pressed(2))buttonFlag[2]=1;
+			if((!is_button_pressed(2)) && (buttonFlag[2])){
+				durationGreen = durationGreenWaiting;
+				buttonFlag[2]=0;
+			}
+			break;
+	}
 }
 
-void update7Seg(int index){
-	display7Seg(led_buffer[index]);
-	switch(index){
-		case 0:
-			enOut=0xE;
+//Function for handling LEDs
+void led_processing(){
+	switch(mode){
+		case MOD_RED:
+			traff1Out=traff1Out==6?7:6;
+			traff2Out=traff2Out==6?7:6;
 			break;
-		case 1:
-			enOut=0xD;
+		case MOD_YELLOW:
+			traff1Out=traff1Out==5?7:5;
+			traff2Out=traff2Out==5?7:5;
 			break;
-		case 2:
-			enOut=0xB;
+		case MOD_GREEN:
+			traff1Out=traff1Out==3?7:3;
+			traff2Out=traff2Out==3?7:3;
 			break;
-		case 3:
-			enOut=0x7;
+	}
+	if(mode!=NORMAL)return;
+	switch(traffCond){
+		case RG:
+			traff1Out=6;
+			traff2Out=3;
 			break;
-		default:
+		case RY:
+			traff1Out=6;
+			traff2Out=5;
+			break;
+		case GR:
+			traff1Out=3;
+			traff2Out=6;
+			break;
+		case YR:
+			traff1Out=5;
+			traff2Out=6;
 			break;
 	}
 }
 
-void update7SegMain(){
-	led7SegCounter=led7SegCounter>=MAX7SEG-1?0:led7SegCounter+1;
-	update7Seg(led7SegCounter);
-}
-
-//Button FSMs
-void fsm_for_mode_button(){
-	switch(modeButtonState){
-		case BUTTON_RELEASED:
-			if(is_button_pressed(0)){
-				modeButtonState = BUTTON_PRESSED;
-			}
-			break;
-		case BUTTON_PRESSED:
-			if(!is_button_pressed(0)){
-				modeButtonState = BUTTON_RELEASED;
-			} else {
-				if(is_button_pressed_1s(0)){
-					modeButtonState = BUTTON_PRESSED_MORE_THAN_1_SECOND;
-				}
-			}
-			break;
-		case BUTTON_PRESSED_MORE_THAN_1_SECOND:
-			if(!is_button_pressed(0)){
-				modeButtonState = BUTTON_RELEASED;
-				switch(mode){
-					case NORMAL:
-						normalInit=0;
-						mode=MOD_RED;
-						break;
-					case MOD_RED:
-						normalInit=0;
-						mode=MOD_YELLOW;
-						break;
-					case MOD_YELLOW:
-						normalInit=0;
-						mode=MOD_GREEN;
-						break;
-					case MOD_GREEN:
-						normalInit=0;
-						mode=NORMAL;
-						if(durationRed>durationYellow+durationGreen){
-							durationGreen=durationRed-durationYellow;
-						}else if(durationRed<durationYellow+durationGreen){
-							if(durationGreen+durationYellow>99){
-								durationRed=99;
-								durationGreen=96;
-								durationYellow=3;
-							}else durationRed=durationGreen+durationYellow;
-						}
-						break;
-				}
-				counter=0;
-				durationRedWaiting = durationRed;
-				durationYellowWaiting = durationYellow;
-				durationGreenWaiting = durationGreen;
-			}
-			break;
-	}
-}
-
-uint8_t done_interval(){
-	if(intervalCounter>0){
-		intervalCounter--;
-		return 0;
-	}
-	intervalCounter=MAX_INTERVAL;
-	return 1;
-}
-
-void fsm_for_modify_button(){
-	switch(modifyButtonState){
-		case BUTTON_RELEASED:
-			if(is_button_pressed(1)){
-				modifyButtonState = BUTTON_PRESSED;
-			}
-			break;
-		case BUTTON_PRESSED:
-			if(!is_button_pressed(1)){
-				modifyButtonState = BUTTON_RELEASED;
-			} else {
-				if(is_button_pressed_1s(1)){
-					modifyButtonState = BUTTON_PRESSED_MORE_THAN_1_SECOND;
-				}
-			}
-			break;
-		case BUTTON_PRESSED_MORE_THAN_1_SECOND:
-			if(!is_button_pressed(1)){
-				modifyButtonState = BUTTON_RELEASED;
-				switch(mode){
-					case MOD_RED:
-						durationRedWaiting = durationRedWaiting >= 99 ? 1 : durationRedWaiting + 1;
-						break;
-					case MOD_YELLOW:
-						durationYellowWaiting = durationYellowWaiting >= 99 ? 1 : durationYellowWaiting + 1;
-						break;
-					case MOD_GREEN:
-						durationGreenWaiting = durationGreenWaiting >= 99 ? 1 : durationGreenWaiting + 1;
-						break;
-				}
-			} else {
-				if(is_button_pressed_3s(1)){
-					modifyButtonState = BUTTON_PRESSED_MORE_THAN_3_SECONDS;
-					intervalCounter=MAX_INTERVAL;
-				}
-			}
-			break;
-		case BUTTON_PRESSED_MORE_THAN_3_SECONDS:
-			if(!is_button_pressed(1)){
-				modifyButtonState = BUTTON_RELEASED;
-			}else if(done_interval()==1){
-				switch(mode){
-					case MOD_RED:
-						durationRedWaiting = durationRedWaiting >= 99 ? 1 : durationRedWaiting + 1;
-						break;
-					case MOD_YELLOW:
-						durationYellowWaiting = durationYellowWaiting >= 99 ? 1 : durationYellowWaiting + 1;
-						break;
-					case MOD_GREEN:
-						durationGreenWaiting = durationGreenWaiting >= 99 ? 1 : durationGreenWaiting + 1;
-						break;
-				}
-			}
-			break;
-	}
+//Function for handling 7 segments LED buffer & decreasing the time
+void buffer_processing(){
 	switch(mode){
 		case MOD_RED:
 			led_buffer[0]=durationRedWaiting/10;
@@ -233,172 +188,39 @@ void fsm_for_modify_button(){
 			led_buffer[3]=durationGreenWaiting%10;
 			break;
 	}
-}
-
-void fsm_for_set_button(){
-	switch(setButtonState){
-		case BUTTON_RELEASED:
-			if(is_button_pressed(2)){
-				setButtonState = BUTTON_PRESSED;
+	if(mode!=NORMAL)return;
+	light1Time--;
+	light2Time--;
+	switch(traffCond){
+		case RG:
+			if(light2Time<=0){
+				traffCond=RY;
+				light2Time=durationYellow;
 			}
 			break;
-		case BUTTON_PRESSED:
-			if(!is_button_pressed(2)){
-				setButtonState = BUTTON_RELEASED;
-			} else {
-				if(is_button_pressed_1s(2)){
-					setButtonState = BUTTON_PRESSED_MORE_THAN_1_SECOND;
-				}
+		case RY:
+			if(light1Time<=0){
+				traffCond=GR;
+				light1Time=durationGreen;
+				light2Time=durationRed;
 			}
 			break;
-		case BUTTON_PRESSED_MORE_THAN_1_SECOND:
-			if(!is_button_pressed(2)){
-				setButtonState = BUTTON_RELEASED;
-				durationRed = durationRedWaiting;
-				durationYellow = durationYellowWaiting;
-				durationGreen = durationGreenWaiting;
+		case GR:
+			if(light1Time<=0){
+				traffCond=YR;
+				light1Time=durationYellow;
 			}
 			break;
-	}
-}
-
-//FSMs for main modes
-void mainMode(){
-	switch(mode){
-		case NORMAL:
-			mode_normal();
-			break;
-		case MOD_RED:
-			mode_mod_red();
-			break;
-		case MOD_YELLOW:
-			mode_mod_yellow();
-			break;
-		case MOD_GREEN:
-			mode_mod_green();
-			break;
-	}
-}
-
-void mode_normal(){
-	if(normalInit==0){
-		traff1Out=6;
-		traff2Out=3;
-		traffCond=RG;
-		light1Time=durationRed;
-		light2Time=durationGreen;
-		normalInit=1;
-		counter=4*MAIN_MODE_PERIOD/TIMER_INTERRUPT_PERIOD;
-	}else{
-		if(counter>0)counter--;
-		else{
-			counter=4*MAIN_MODE_PERIOD/TIMER_INTERRUPT_PERIOD;
-			switch(traffCond){
-				case RG:
-					if(light1Time>0&&light2Time>0){
-						light1Time--;
-						light2Time--;
-					}else{
-						traff1Out=6;
-						traff2Out=5;
-						light2Time=durationYellow;
-						traffCond=RY;
-					}
-					break;
-				case RY:
-					if(light1Time>0&&light2Time>0){
-						light1Time--;
-						light2Time--;
-					}else{
-						traff1Out=3;
-						traff2Out=6;
-						light1Time=durationGreen;
-						light2Time=durationRed;
-						traffCond=GR;
-					}
-					break;
-				case GR:
-					if(light1Time>0&&light2Time>0){
-						light1Time--;
-						light2Time--;
-					}else{
-						traff1Out=5;
-						traff2Out=6;
-						light1Time=durationYellow;
-						traffCond=YR;
-					}
-					break;
-				case YR:
-					if(light1Time>0&&light2Time>0){
-						light1Time--;
-						light2Time--;
-					}else{
-						traff1Out=6;
-						traff2Out=3;
-						light2Time=durationGreen;
-						light1Time=durationRed;
-						traffCond=RG;
-					}
-					break;
+		case YR:
+			if(light2Time<=0){
+				traffCond=RG;
+				light1Time=durationRed;
+				light2Time=durationGreen;
 			}
-		}
+			break;
 	}
 	led_buffer[0]=light1Time/10;
 	led_buffer[1]=light1Time%10;
 	led_buffer[2]=light2Time/10;
 	led_buffer[3]=light2Time%10;
-}
-
-void mode_mod_red(){
-	if(counter>0)counter--;
-	else{
-		counter=MAIN_MODE_PERIOD/TIMER_INTERRUPT_PERIOD;
-		if(normalInit==0){
-			traff1Out=6;
-			traff2Out=6;
-			normalInit=1;
-		}else{
-			normalInit=0;
-			traff1Out=7;
-			traff2Out=7;
-		}
-	}
-}
-
-void mode_mod_yellow(){
-	if(counter>0)counter--;
-	else{
-		counter=MAIN_MODE_PERIOD/TIMER_INTERRUPT_PERIOD;
-		if(normalInit==0){
-			traff1Out=5;
-			traff2Out=5;
-			normalInit=1;
-		}else{
-			normalInit=0;
-			traff1Out=7;
-			traff2Out=7;
-		}
-	}
-}
-
-void mode_mod_green(){
-	if(counter>0)counter--;
-	else{
-		counter=MAIN_MODE_PERIOD/TIMER_INTERRUPT_PERIOD;
-		if(normalInit==0){
-			traff1Out=3;
-			traff2Out=3;
-			normalInit=1;
-		}else{
-			normalInit=0;
-			traff1Out=7;
-			traff2Out=7;
-		}
-	}
-}
-
-//Registering output to pins
-void displayAll(){
-	GPIOA->ODR=(traff1Out<<12)|(traff2Out<<4);
-	GPIOB->ODR=(enOut<<8)|(segOut);
 }

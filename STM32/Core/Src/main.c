@@ -23,16 +23,15 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "input_processing.h"
-#include "timerMCU.h"
 #include "input_reading.h"
-
-//#include "input_reading.h"
+#include "timerMCU.h"
+#include "hardware_processing.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+uint8_t mode = INIT;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -105,9 +104,8 @@ int main(void)
   setTimer(31,1);
   setTimer(51,2);
   setTimer(71,3);
-  setTimer(91,4);
-  setTimer(111,5);
-  setTimer(131,6);
+  setTimer(111,4);
+  setTimer(131,5);
   while (1)
   {
 	  if(timerFlag[0]==1){
@@ -116,27 +114,23 @@ int main(void)
 	  }
 	  if(timerFlag[1]==1){
 		  setTimer(MAIN_MODE_PERIOD,1);
-		  mainMode();
+		  fsm_automatic();
 	  }
 	  if(timerFlag[2]==1){
-		  setTimer(250,2);
-		  update7SegMain();
+		  setTimer(1000,2);
+		  buffer_processing();
 	  }
 	  if(timerFlag[3]==1){
 		  setTimer(250,3);
-		  displayAll();
+		  led_processing();
 	  }
 	  if(timerFlag[4]==1){
-		  setTimer(50,4);
-		  fsm_for_mode_button();
+		  setTimer(250,4);
+		  update7SegMain();
 	  }
 	  if(timerFlag[5]==1){
-		  setTimer(50,5);
-		  fsm_for_modify_button();
-	  }
-	  if(timerFlag[6]==1){
-		  setTimer(50,6);
-		  fsm_for_set_button();
+		  setTimer(10,5);
+		  displayAll();
 	  }
     /* USER CODE END WHILE */
 

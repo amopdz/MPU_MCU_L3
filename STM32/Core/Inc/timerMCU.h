@@ -15,7 +15,7 @@
 extern uint8_t timerFlag[];
 
 void initTimer();
-void setTimer(uint8_t, uint8_t);
+void setTimer(uint16_t, uint8_t);
 void timerRun();
 
 #endif /* INC_TIMERMCU_H_ */

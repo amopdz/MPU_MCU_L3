@@ -1,37 +1,32 @@
 /*
- * input_processing.h
+ * input_processing_new.h
  *
- *  Created on: Oct 13, 2023
- *      Author: hh.aof
+ *  Created on: Oct 23, 2023
+ *      Author: hhaof
  */
 
 #ifndef INC_INPUT_PROCESSING_H_
 #define INC_INPUT_PROCESSING_H_
 
-//Button FSMs
-void fsm_for_mode_button();
-void fsm_for_modify_button();
-void fsm_for_set_button();
+#include "main.h"
 
-//Individual mode handlers
-void mode_normal();
-void mode_mod_red();
-void mode_mod_yellow();
-void mode_mod_green();
+//States for the FSM of buttons
+#define INIT 0
+#define NORMAL 1
+#define MOD_RED 2
+#define MOD_YELLOW 3
+#define MOD_GREEN 4
 
-//Driver code for modes
-void mainMode();
+//Button FSM
+void fsm_automatic();
 
-//7Seg & 7Seg buffer
-#ifndef MAX7SEG
-#define MAX7SEG 4
-#endif /* MAX7SEG */
+//Display buffers
+extern uint8_t traff1Out,
+			   traff2Out,
+			   led_buffer[];
 
-void update7Seg(int index);
-void update7SegBuffer();
-void update7SegMain();
-
-//Registering output to pins
-void displayAll();
+//LED & 7 Seg buffer processing
+void led_processing();
+void buffer_processing();
 
 #endif /* INC_INPUT_PROCESSING_H_ */

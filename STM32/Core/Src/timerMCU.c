@@ -18,7 +18,7 @@ void initTimer(){
 	}
 }
 
-void setTimer(uint8_t duration, uint8_t index){
+void setTimer(uint16_t duration, uint8_t index){
 	if(index>=0&&index<N0_OF_TIMER){
 		timerCounter[index]=duration/TIMER_INTERRUPT_PERIOD;
 		timerFlag[index]=0;

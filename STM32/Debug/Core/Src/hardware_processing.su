@@ -1,0 +1,4 @@
+hardware_processing.c:33:6:display7Seg	16	static
+hardware_processing.c:37:6:update7Seg	16	static
+hardware_processing.c:57:6:update7SegMain	8	static
+hardware_processing.c:63:6:displayAll	4	static

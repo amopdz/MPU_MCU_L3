@@ -1,13 +1,3 @@
-input_processing.c:65:6:display7Seg	16	static
-input_processing.c:69:6:update7Seg	16	static
-input_processing.c:89:6:update7SegMain	8	static
-input_processing.c:96:6:fsm_for_mode_button	8	static
-input_processing.c:151:9:done_interval	4	static
-input_processing.c:160:6:fsm_for_modify_button	8	static
-input_processing.c:237:6:fsm_for_set_button	8	static
-input_processing.c:265:6:mainMode	8	static
-input_processing.c:282:6:mode_normal	4	static
-input_processing.c:351:6:mode_mod_red	4	static
-input_processing.c:367:6:mode_mod_yellow	4	static
-input_processing.c:383:6:mode_mod_green	4	static
-input_processing.c:400:6:displayAll	4	static
+input_processing.c:31:6:fsm_automatic	8	static
+input_processing.c:130:6:led_processing	4	static
+input_processing.c:166:6:buffer_processing	4	static

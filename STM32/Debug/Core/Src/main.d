@@ -1,5 +1,5 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
+Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/input_processing.h \
+ ../Core/Inc/main.h ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h \
@@ -23,8 +23,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
- ../Core/Inc/input_processing.h ../Core/Inc/timerMCU.h \
- ../Core/Inc/input_reading.h
+ ../Core/Inc/input_reading.h ../Core/Inc/main.h ../Core/Inc/timerMCU.h \
+ ../Core/Inc/hardware_processing.h
+
+../Core/Inc/input_processing.h:
 
 ../Core/Inc/main.h:
 
@@ -76,8 +78,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 
-../Core/Inc/input_processing.h:
+../Core/Inc/input_reading.h:
+
+../Core/Inc/main.h:
 
 ../Core/Inc/timerMCU.h:
 
-../Core/Inc/input_reading.h:
+../Core/Inc/hardware_processing.h:
