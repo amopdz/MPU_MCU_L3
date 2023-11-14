@@ -17,7 +17,7 @@
 
 uint8_t light1Time,	//Time for the two 7 segment LEDs
         light2Time,
-		durationRed = 5,	//Duration for each of the lights & their duration waiting to be set
+		durationRed = 99,	//Duration for each of the lights & their duration waiting to be set
 		durationRedWaiting,
 		durationYellow = 2,
 		durationYellowWaiting,
