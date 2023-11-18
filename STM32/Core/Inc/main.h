@@ -38,6 +38,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 extern uint8_t mode;
+extern UART_HandleTypeDef huart2;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -58,6 +59,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TEST0_Pin GPIO_PIN_0
+#define TEST0_GPIO_Port GPIOA
+#define TEST1_Pin GPIO_PIN_1
+#define TEST1_GPIO_Port GPIOA
 #define RED1_Pin GPIO_PIN_4
 #define RED1_GPIO_Port GPIOA
 #define YELLOW1_Pin GPIO_PIN_5

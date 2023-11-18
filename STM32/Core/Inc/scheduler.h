@@ -7,27 +7,18 @@
 
 #ifndef INC_SCHEDULER_H_
 #define INC_SCHEDULER_H_
+#define MAX_SCHEDULER_TASKS 40
 
 #include "main.h"
 
 /*
- * Watchdog timer
- */
-/*void MX_IWDG_Init();
-void Watchdog_Refresh();
-unsigned char Is_Watchdog_Reset();
-void Watchdog_Counting();
-void Reset_Watchdog_Counting();*/
-
-/*
  * Scheduler
  */
-void SCH_Init(void);
+
 void SCH_Update(void);
-unsigned char SCH_Add_Task(void (*pFunction)(), unsigned int, unsigned int);
-void SCH_Dispatch_Tasks();
-unsigned char SCH_Delete_Task(const unsigned char);
-void SCH_Go_To_Sleep();
-void SCH_Report_Status();
+int SCH_Add_Task(void (*funcPointer)(), uint32_t delay, uint32_t period);
+void SCH_Delete_Task(uint32_t);
+void SCH_Dispatch_Tasks(void);
+void SCH_Force_End(void);
 
 #endif /* INC_SCHEDULER_H_ */

@@ -46,10 +46,9 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim2;
-uint8_t mode = INIT;
+
 UART_HandleTypeDef huart2;
-char str[40];
-uint32_t triggerCallback = 0;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -65,7 +64,26 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t temp=0;
+int test1Index;
+uint8_t mode = INIT;
+/*, end_flag = 0;
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+	if(huart->Instance == USART2){
+		HAL_UART_Transmit(&huart2, &temp, 1, 50);
+		if(temp=='!') end_flag = 1;
+	}
+}*/
+
+void testAt0(){
+	HAL_GPIO_TogglePin(TEST0_GPIO_Port, TEST0_Pin);
+}
+
+void testAt1(){
+	HAL_GPIO_TogglePin(TEST1_GPIO_Port, TEST1_Pin);
+	SCH_Delete_Task(test1Index);
+}
 /* USER CODE END 0 */
 
 /**
@@ -100,11 +118,13 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
-
+  //HAL_UART_Receive_IT(&huart2, &temp, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  SCH_Add_Task(testAt0, 0, 0);
+  test1Index = SCH_Add_Task(testAt1, 10, 1000);
   SCH_Add_Task(button_reading, 21, 10);
   SCH_Add_Task(fsm_automatic, 31, MAIN_MODE_PERIOD);
   SCH_Add_Task(buffer_processing, 51, 1000);
@@ -113,6 +133,10 @@ int main(void)
   SCH_Add_Task(displayAll, 131, 10);
   while (1)
   {
+	  //char str[40];
+	  //HAL_UART_Transmit(&huart2, (void*)str, sprintf(str, "Dispatching task\r\n"), 200);
+	  //if(end_flag)SCH_Force_End();
+	  //else
 	  SCH_Dispatch_Tasks();
     /* USER CODE END WHILE */
 
@@ -248,18 +272,18 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, RED1_Pin|YELLOW1_Pin|GREEN1_Pin|RED0_Pin
-                          |YELLOW0_Pin|GREEN0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, TEST0_Pin|TEST1_Pin|RED1_Pin|YELLOW1_Pin
+                          |GREEN1_Pin|RED0_Pin|YELLOW0_Pin|GREEN0_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SEG00_Pin|SEG01_Pin|SEG02_Pin|EN2_Pin
                           |EN3_Pin|SEG03_Pin|SEG04_Pin|SEG05_Pin
                           |SEG06_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : RED1_Pin YELLOW1_Pin GREEN1_Pin RED0_Pin
-                           YELLOW0_Pin GREEN0_Pin */
-  GPIO_InitStruct.Pin = RED1_Pin|YELLOW1_Pin|GREEN1_Pin|RED0_Pin
-                          |YELLOW0_Pin|GREEN0_Pin;
+  /*Configure GPIO pins : TEST0_Pin TEST1_Pin RED1_Pin YELLOW1_Pin
+                           GREEN1_Pin RED0_Pin YELLOW0_Pin GREEN0_Pin */
+  GPIO_InitStruct.Pin = TEST0_Pin|TEST1_Pin|RED1_Pin|YELLOW1_Pin
+                          |GREEN1_Pin|RED0_Pin|YELLOW0_Pin|GREEN0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -287,11 +311,13 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim )
 {
-	SCH_Update();
-	uint32_t currentTick = HAL_GetTick();
-    uint32_t elapsed = currentTick - triggerCallback;
-    triggerCallback = currentTick;
-	HAL_UART_Transmit(&huart2, (void*)str, sprintf(str, "%lu\r\n", elapsed), 50);
+	//if(!end_flag){
+		SCH_Update();
+		//uint32_t currentTick = HAL_GetTick();
+		//uint32_t elapsed = currentTick - triggerCallback;
+		//triggerCallback = currentTick;
+		//HAL_UART_Transmit(&huart2, (void*)str, sprintf(str, "ELAPSED TIME: %lu\r\n", elapsed), 50);
+	//}
 }
 /* USER CODE END 4 */
 

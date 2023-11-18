@@ -8,7 +8,7 @@
   <PWI>
    <POPUP w="800" x="38" flags="00000002" y="129" h="200" pid="0" iid="-1">
     <PROPERTIES>
-     <ITEM name="Message Column Width">542</ITEM>
+     <ITEM name="Message Column Width">663</ITEM>
      <ITEM name="ShowGrid">No</ITEM>
      <ITEM name="Source Column Width">100</ITEM>
      <ITEM name="Time Column Width">120</ITEM>
@@ -343,7 +343,7 @@
      <ITEM name="nBreakpoints">0</ITEM>
     </PROPERTIES>
    </POPUP>
-   <POPUP w="300" x="698" flags="0000000b" y="732" h="300" pid="101" iid="1">
+   <POPUP w="300" x="713" flags="0000000b" y="394" h="300" pid="101" iid="1">
     <PROPERTIES>
      <ITEM name="Address Column Width">94</ITEM>
      <ITEM name="AutoResize">No</ITEM>
@@ -366,7 +366,7 @@
    <POPUP w="170" x="738" flags="00000008" y="829" h="237" pid="191" iid="1">
     <PROPERTIES/>
    </POPUP>
-   <POPUP w="450" x="38" flags="00000023" y="129" h="250" pid="0" iid="32">
+   <POPUP w="464" x="57" flags="00008023" y="421" h="228" pid="0" iid="32">
     <PROPERTIES>
      <ITEM name="AutoEcho">0</ITEM>
      <ITEM name="HexMode">0</ITEM>
